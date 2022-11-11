@@ -1,0 +1,12 @@
+# (uncomment to add a dependency)
+ dependencies:
+  - name: path
+    version: 1.0.0
+    src: htmlwidgets/lib/path-1.0.0
+    script:
+      - d3.min.js
+      - colors.js
+      - d3.v4.js
+      - d3-path.v2.js
+    stylesheet:
+      - extra.css
