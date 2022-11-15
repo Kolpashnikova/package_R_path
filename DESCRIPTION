@@ -1,12 +1,11 @@
 Package: path
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Diary Paths Visualization for Time-Use Data in R
+Version: 1.0.0
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person("Kamila", "Kolpashnikova", , "kamilakolpashnikova@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-6338-0977"))
+Description: Visualizes paths from and into an activity in a chord diagram.The sizes of the objects are relative to the survey weights.
+License: The 3-Clause BSD License
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
