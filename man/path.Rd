@@ -4,7 +4,7 @@
 \alias{path}
 \title{Diary Paths Visualization for Time-Use Data in R}
 \usage{
-path(df, act, w = NULL)
+path(df, act, w = NULL, width = "auto", height = "auto")
 }
 \arguments{
 \item{df}{a json data.Each row represents an observation. Each column represents
@@ -15,6 +15,12 @@ diary's granularity.}
 
 \item{w}{a json array of survey weights for each observation. Default is NULL, which returns
 all nodes of the same size.}
+
+\item{width}{a string specifying the width of the output file in pixels (px), it's "auto" by default --
+which specifies responsive size}
+
+\item{height}{a string specifying the height of the output file in pixels (px), it's "auto" by default --
+which specifies responsive size}
 }
 \description{
 Visualizes paths from and into an activity in a chord diagram.The sizes of the objects

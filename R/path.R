@@ -5,7 +5,7 @@
 #' are relative to the survey weights.
 #'
 #' @usage
-#' path(df, act, w = NULL)
+#' path(df, act, w = NULL, width = "auto", height = "auto")
 #'
 #' @param df a json data.Each row represents an observation. Each column represents
 #' the diary activity at t=1 (4am) to t=1440 (3:59am), but the number of steps depends
@@ -16,6 +16,12 @@
 #' @param w a json array of survey weights for each observation. Default is NULL, which returns
 #' all nodes of the same size.
 #'
+#' @param width a string specifying the width of the output file in pixels (px), it's "auto" by default --
+#' which specifies responsive size
+#'
+#' @param height a string specifying the height of the output file in pixels (px), it's "auto" by default --
+#' which specifies responsive size
+#'
 #' @references
 #' Kolpashnikova, Kamila. (2022). Diary Paths Visualization for Time-Use Data in R. Toronto,ON: York University.
 #'
@@ -23,7 +29,7 @@
 #' @import htmlwidgets
 #'
 #' @export
-path <- function(df, act, w = NULL, width = NULL, height = NULL, elementId = NULL) {
+path <- function(df, act, w = NULL, width = "auto", height = "auto", elementId = NULL) {
 
   # forward options using x
   x = list(
