@@ -29,30 +29,7 @@ HTMLWidgets.widget({
                     var width = d3.select("#pathChartContainer").style('width'),
                         height = d3.select("#pathChartContainer").style('height');
 
-                    var xGrid = d3.scale.linear()
-                        .domain([1, 7])
-                        .range([0, width]);
-
-                    var yGrid = d3.scale.linear()
-                        .domain([1, 9])
-                        .range([0, height]);
-                    // number of centers should reflect the number of activities
-                    var xCenter = [parseInt(xGrid(4)), parseInt(xGrid(4)), parseInt(xGrid(4)),
-                        parseInt(xGrid(2)), parseInt(xGrid(2)), parseInt(xGrid(2)),
-                        parseInt(xGrid(6)), parseInt(xGrid(2)), parseInt(xGrid(6)),
-                        parseInt(xGrid(6)), parseInt(xGrid(6)), parseInt(xGrid(4))];
-                    var yCenter = [parseInt(yGrid(2)), parseInt(yGrid(5)), parseInt(yGrid(7)), parseInt(yGrid(4)),
-                        parseInt(yGrid(8)), parseInt(yGrid(2)), parseInt(yGrid(2)), parseInt(yGrid(6)),
-                        parseInt(yGrid(8)), parseInt(yGrid(4)), parseInt(yGrid(6)), parseInt(yGrid(3))];
-
                     var Activities = x.act;
-
-                    //var flippedActivities = {
-                    //    1: 'Sleep', 2: 'Personal Care',
-                    //    3: 'Housework', 4: 'Child Care', 5: 'Adult Care', 6: 'Work',
-                    //    7: 'Shopping', 8: 'TV Watching', 9: 'Eating', 10: 'Leisure', 11: 'Travel'
-                    //};
-
 
                     function swap(json){
                       var ret = {};
@@ -64,7 +41,173 @@ HTMLWidgets.widget({
 
                     var flippedActivities = swap(Activities);
 
-                    var colorScale = d3.scale.category20();
+                    //custom functions
+                		function findSmallestDifferencePair(number) {
+                		    var smallestDiffPair = { first: 1, second: number }; // Initialize with the smallest possible pair
+                		    var smallestDifference = Math.abs(1 - number); // Initialize with the largest possible difference
+
+                		    for (var i = 1; i <= Math.floor(Math.sqrt(number)); i++) {
+                		        if (number % i === 0) {
+                		            var pair = { first: i, second: number / i };
+                		            var difference = Math.abs(pair.first - pair.second);
+
+                		            // Check if the current pair has a smaller difference
+                		            if (difference < smallestDifference) {
+                		                smallestDifference = difference;
+                		                smallestDiffPair = pair;
+                		            }
+                		        }
+                		    }
+
+
+                		    if (smallestDiffPair.first === 1 && smallestDiffPair.second === number) {
+                		        return null;
+                		    } else {
+                		        return smallestDiffPair;
+                    		}
+                		}
+
+                		function findClosestLargerNumberWithPair(number) {
+                		    while (true) {
+                		        var result = findSmallestDifferencePair(number);
+                		        if (result !== null) {
+                		            return number;
+                		        }
+                		        number++; // Increment the number and try again
+                		    }
+                		}
+
+                		function rearrangeArray(array) {
+                		    var midpoint = Math.floor(array.length / 2); // Find the midpoint
+
+                		    // Split the array into two parts
+                		    var firstHalf = array.slice(0, midpoint);
+                		    var secondHalf = array.slice(midpoint);
+
+                		    // Add the first half to the end of the second half
+                		    var combinedArray = secondHalf.concat(firstHalf);
+
+                		    return combinedArray;
+                		}
+
+                		function removeMidpoint(array, compareArrayN) {
+                			var n = array.length - compareArrayN;
+                		    var midpoint = Math.floor(array.length / 2); // Find the midpoint
+
+                		    // Split the array into two parts
+                		    var firstHalf = array.slice(0, midpoint);
+                		    var secondHalf = array.slice(midpoint+1);
+
+                		    // Add the first half to the end of the second half
+                		    var combinedArray = firstHalf.concat(secondHalf);
+
+                		    return combinedArray;
+                		}
+
+                		//custom variables
+                    var layout = x.layout;
+            		    var focusActivity = x.focusActivity;
+            		    var colors = x.colors;
+
+              			// Define the number of activities
+              			var numActivities = Object.keys(flippedActivities).length;
+
+            		    if (layout === "circular") {
+                  			// Define the radius for the circular layout
+                  			var circleRadius = (Math.min(parseInt(width, 10), parseInt(height, 10)) / 2) - 20;
+
+                  			// Calculate angular positions for activities based on categories
+                  			var angleStep = (2 * Math.PI) / numActivities;
+
+                  			var xCenter = [];
+                  			var yCenter = [];
+
+                  			for (var i = 0; i < numActivities; i++) {
+                  			    var angle = i * angleStep;
+                  			    var xPosition = circleRadius * Math.cos(angle) + parseInt(width, 10) / 2; // Adjust for centering
+                  			    var yPosition = circleRadius * Math.sin(angle) + parseInt(height, 10) / 2; // Adjust for centering
+                  			    xCenter.push(xPosition);
+                  			    yCenter.push(yPosition);
+                  			}
+                  	} else if (layout === "circularCenter") {
+                  			// Define the radius for the circular layout
+                  			var circleRadius = (Math.min(parseInt(width, 10), parseInt(height, 10)) / 2) - 20;
+
+                  			// Calculate angular positions for activities based on categories
+                  			var angleStep = (2 * Math.PI) / (numActivities - 1);
+
+                  			var xCenter = [];
+                  			var yCenter = [];
+
+                  			for (var i = 0; i < numActivities; i++) {
+                  			    var angle = i * angleStep;
+                  			    var xPosition = circleRadius * Math.cos(angle) + parseInt(width, 10) / 2; // Adjust for centering
+                  			    var yPosition = circleRadius * Math.sin(angle) + parseInt(height, 10) / 2; // Adjust for centering
+                  			    xCenter.push(xPosition);
+                  			    yCenter.push(yPosition);
+                  			}
+
+                  			xCenter.splice(Activities[focusActivity]-1, 0, parseInt(width, 10) / 2);
+                  			yCenter.splice(Activities[focusActivity]-1, 0, parseInt(height, 10) / 2);
+
+                  	} else if (Object.keys(flippedActivities).length === 11) {
+                        var xGrid = d3.scale.linear()
+                            .domain([1, 7])
+                            .range([0, width]);
+
+                        var yGrid = d3.scale.linear()
+                            .domain([1, 9])
+                            .range([0, height]);
+                        // number of centers should reflect the number of activities
+                        var xCenter = [parseInt(xGrid(4)), parseInt(xGrid(4)), parseInt(xGrid(4)),
+                            parseInt(xGrid(2)), parseInt(xGrid(2)), parseInt(xGrid(2)),
+                            parseInt(xGrid(6)), parseInt(xGrid(2)), parseInt(xGrid(6)),
+                            parseInt(xGrid(6)), parseInt(xGrid(6)), parseInt(xGrid(4))];
+                        var yCenter = [parseInt(yGrid(2)), parseInt(yGrid(5)), parseInt(yGrid(7)), parseInt(yGrid(4)),
+                            parseInt(yGrid(8)), parseInt(yGrid(2)), parseInt(yGrid(2)), parseInt(yGrid(6)),
+                            parseInt(yGrid(8)), parseInt(yGrid(4)), parseInt(yGrid(6)), parseInt(yGrid(3))];
+            		    } else {
+
+                  			var closestLargerNumber = findClosestLargerNumberWithPair(numActivities);
+                  			var ColumnsRows = findSmallestDifferencePair(closestLargerNumber);
+
+                  			var numColumns = ColumnsRows.first;
+                  			var gridSizeX = numColumns*2 + 1; // Define the number of columns in the grid
+                  			var numRows = ColumnsRows.second;
+                  			var gridSizeY = numRows*2 + 1; // Define the number of rows in the grid
+
+                  	        var xGrid = d3.scale.linear()
+                  	            .domain([1, gridSizeX])
+                  	            .range([0, width]);
+
+                  	        var yGrid = d3.scale.linear()
+                  	            .domain([1, gridSizeY])
+                  	            .range([0, height]);
+
+                  			var xC = [];
+                  			var yC = [];
+
+                  			for (var i = 0; i < numColumns; i++) {
+                  				for (var j = 0; j < numRows; j++) {
+                  			        var xValue = (i+1)*2;
+                  			        var yValue = (j+1)*2;
+                  			        xC.push(parseInt(xGrid(xValue)));
+                  			        yC.push(parseInt(yGrid(yValue)));
+                  				}
+                  			}
+
+                  			var xCenter = rearrangeArray(removeMidpoint(xC, numActivities));
+                  			var yCenter = rearrangeArray(removeMidpoint(yC, numActivities));
+
+                  	}
+
+                    if (colors !== undefined && colors !== null){
+              			    var colorScale = d3.scale.ordinal()
+                  			    .domain([1, numActivities + 1]) // Numbers as the domain
+                  			    .range(colors);
+                    } else {
+                      	var colorScale = d3.scale.category20();
+                    }
 
                     var radius = width < 400 ? 1 : 4;
 
@@ -91,8 +234,8 @@ HTMLWidgets.widget({
 
                     //console.log(nodes);
 
-                    var forceX = d3v4.forceX((d) => xCenter[d.category]).strength(1);
-                    var forceY = d3v4.forceY((d) => yCenter[d.category]).strength(1);
+                    var forceX = d3v4.forceX((d) => xCenter[d.category-1]).strength(1);
+                    var forceY = d3v4.forceY((d) => yCenter[d.category-1]).strength(1);
 
 
                     var simulation = d3v4.forceSimulation(nodes)
@@ -128,8 +271,8 @@ HTMLWidgets.widget({
                         .enter().append("text")
                         .attr("class", "labelMain")
                         .attr("text-anchor", "middle")
-                        .attr("x", d => xCenter[Activities[d]])
-                        .attr("y", d => yCenter[Activities[d]])
+                        .attr("x", d => xCenter[Activities[d]-1])
+                        .attr("y", d => yCenter[Activities[d]-1])
                         .style("fill", 'dimgray')
                         // .attr("dy", "0em")
                         .text(d => d)

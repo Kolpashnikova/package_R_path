@@ -12,4 +12,6 @@ act <- fromJSON('{
   }')
 
 
-path(df = toJSON(s), act = act, w=w)
+path(df = toJSON(s), act = act, w=w, layout = "circularCenter", focusActivity = "Sleep",
+     colors = c("#FF5733", "#33FF57", "#337AFF", "#FF33D4", "#FFFF33", "#4A90E2",
+                "#FFA500", "#8A2BE2", "#008000", "#800000", "#A52A2A"))

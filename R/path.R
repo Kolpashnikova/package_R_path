@@ -5,7 +5,8 @@
 #' are relative to the survey weights.
 #'
 #' @usage
-#' path(df, act, w = NULL, width = "auto", height = "auto")
+#' path(df, act, w = NULL, layout = "default", focusActivity = NULL,
+#'     width = "auto", height = "auto")
 #'
 #' @param df a json data.Each row represents an observation. Each column represents
 #' the diary activity at t=1 (4am) to t=1440 (3:59am), but the number of steps depends
@@ -13,29 +14,45 @@
 #'
 #' @param act a json object with the codes of activities
 #'
-#' @param w a json array of survey weights for each observation. Default is NULL, which returns
-#' all nodes of the same size.
+#' @param w a json array of survey weights for each observation. Default is NULL,
+#' which returns all nodes of the same size.
 #'
-#' @param width a string specifying the width of the output file in pixels (px), it's "auto" by default --
+#' @param layout a string option from ("default", "circular", "circularCenter"),
+#' which will make a grid layout or a circular
+#' layout with different activities across the circle. "circularCenter" needs
+#' the option focusActivity to be specified,
+#' which will place an activity at the center of the circle.
+#'
+#' @param focusActivity a string with the name of the activity to make the focus.
+#'
+#' @param colors a list of hex custom colors for activities.
+#'
+#' @param width a string specifying the width of the output file in pixels (px),
+#' it's "auto" by default --
 #' which specifies responsive size
 #'
-#' @param height a string specifying the height of the output file in pixels (px), it's "auto" by default --
+#' @param height a string specifying the height of the output file in pixels (px),
+#' it's "auto" by default --
 #' which specifies responsive size
 #'
 #' @references
-#' Kolpashnikova, Kamila. (2022). Diary Paths Visualization for Time-Use Data in R. Toronto,ON: York University.
+#' Kolpashnikova, Kamila. (2022). Diary Paths Visualization for Time-Use Data in R.
+#' Toronto,ON: York University.
 #'
 #'
 #' @import htmlwidgets
 #'
 #' @export
-path <- function(df, act, w = NULL, width = "auto", height = "auto", elementId = NULL) {
+path <- function(df, act, w = NULL, layout = "default", focusActivity = NULL, colors = NULL, width = "auto", height = "auto", elementId = NULL) {
 
   # forward options using x
   x = list(
     data = df,
     weights = w,
     act = act,
+    layout = layout,
+    focusActivity = focusActivity,
+    colors = colors,
     message = "works"
   )
 
